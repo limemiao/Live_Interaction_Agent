@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>唱歌/说话 打标</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.6 -apple-system,"Microsoft YaHei",sans-serif;
+     background:#0f1115;color:#e6e6e6;padding:18px 18px 80px}
+h2{margin:0 0 6px;font-size:17px}
+.hint{color:#9aa4b2;font-size:13px;margin-bottom:16px;line-height:1.9}
+.hint b{color:#7cc4ff}
+h3{font-size:14px;color:#9aa4b2;margin:22px 0 10px;font-weight:500;
+   border-left:3px solid #2f6feb;padding-left:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px}
+.card{background:#171a21;border:1px solid #2a2f3a;border-radius:8px;padding:10px 12px}
+.card.done{border-color:#3ddc84}
+.ttl{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.ttl b{color:#7cc4ff;font-size:13px}
+.note{color:#5f6875;font-size:11px;margin-bottom:6px}
+.btns{display:flex;gap:6px;margin-top:8px}
+button{flex:1;padding:7px 4px;border:1px solid #333a46;border-radius:6px;
+       background:#0f1115;color:#cfd6e0;cursor:pointer;font-size:13px}
+button:hover{border-color:#7cc4ff}
+button.on{background:#2f6feb;border-color:#2f6feb;color:#fff}
+button.on.sing{background:#d97706;border-color:#d97706}
+audio{width:100%;height:32px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#171a21;
+     border-top:1px solid #2a2f3a;padding:10px 18px;display:flex;
+     gap:14px;align-items:center;z-index:9}
+#prog{color:#9aa4b2;font-size:13px}
+textarea{width:100%;height:110px;margin-top:12px;background:#0f1115;
+         color:#cfd6e0;border:1px solid #2a2f3a;border-radius:6px;padding:8px;
+         font:12px/1.5 monospace;display:none}
+.saved{color:#3ddc84}
+</style></head><body>
+<h2>唱歌 / 说话 打标</h2>
+<div class="hint">
+  点开播放器听一遍，然后点「说话」「唱歌」或「不确定」。<br>
+  <b>复核区</b>那几段是模型判断摇摆的边界样本，我最需要它们——
+  你听到什么就标什么，不用管模型给出的概率。
+</div>
+<main id="main"></main>
+<div class="bar">
+  <span id="prog">已标 0 / 0</span>
+  <button style="flex:0 0 140px" onclick="save()">保存</button>
+</div>
+<textarea id="out" readonly></textarea>
+<script>
+const labels = {};
+let items = [];
+
+function card(it, gi, i){
+  const c = document.createElement('div');
+  c.className='card'; c.id='c'+gi+'_'+i;
+  c.innerHTML =
+    '<div class="ttl"><b>'+it.file+'</b></div>'+
+    (it.note? '<div class="note">'+it.note+'</div>' : '')+
+    '<audio controls preload="none" src="clips/'+it.file+'"></audio>'+
+    '<div class="btns">'+
+      '<button onclick="set(\''+it.file+'\',\'speech\',this,\''+c.id+'\')">说话</button>'+
+      '<button onclick="set(\''+it.file+'\',\'sing\',this,\''+c.id+'\')">唱歌</button>'+
+      '<button onclick="set(\''+it.file+'\',\'unsure\',this,\''+c.id+'\')">不确定</button>'+
+    '</div>';
+  return c;
+}
+
+function set(file, v, btn, cid){
+  labels[file]=v;
+  const c=document.getElementById(cid);
+  c.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); c.classList.add('done');
+  update();
+}
+function update(){
+  document.getElementById('prog').textContent =
+    '已标 '+Object.keys(labels).length+' / '+items.length;
+}
+
+fetch('clips.json').then(r=>r.json()).then(list=>{
+  items = list;
+  const main = document.getElementById('main');
+  const groups = [['verify','复核区（模型摇摆的边界样本）'],
+                  ['first','初标区（30 段抽样）']];
+  for(const [g, title] of groups){
+    const sub = items.filter(x=>x.group===g);
+    if(!sub.length) continue;
+    const h = document.createElement('h3'); h.textContent = title; main.appendChild(h);
+    const grid = document.createElement('div'); grid.className='grid';
+    sub.forEach((it,i)=>grid.appendChild(card(it,g,i)));
+    main.appendChild(grid);
+  }
+  update();
+});
+
+function save(){
+  fetch('/labels',{method:'POST',headers:{'Content-Type':'application/json'},
+                   body:JSON.stringify({labels})})
+    .then(r=>r.json()).then(()=>{
+      document.getElementById('prog').innerHTML =
+        '<span class="saved">已保存到 labels.json（共 '+
+        Object.keys(labels).length+' 条）</span>';
+    }).catch(()=>{
+      const ta=document.getElementById('out');
+      ta.style.display='block';
+      ta.value=JSON.stringify({labels},null,2); ta.select();
+      document.getElementById('prog').textContent='请复制下方内容发我';
+    });
+}
+</script></body></html>

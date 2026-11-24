@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.env
+
+# 本地配置与凭证
+config.yaml
+bili_cookies*.json
+
+# 运行时数据与录制内容
+audio/
+data/
+output/
+archive/
+run/
+models/
+danmaku_*.txt
+transcript_*.txt
+experiments/labeling/clips/
+experiments/labeling/labels.json
+*.log
+*.err
