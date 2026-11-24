@@ -7,8 +7,8 @@
     Cookie: SESSDATA(登录态) + bili_jct(csrf token) + DedeUserID
 
 用法:
-    python bili_send_danmaku.py --room-id 123456789 --text "测试弹幕" --dry-run
-    python bili_send_danmaku.py --room-id 123456789 --text "测试弹幕"
+    python -m integrations.bili_send_danmaku --room-id 123456789 --text "测试弹幕" --dry-run
+    python -m integrations.bili_send_danmaku --room-id 123456789 --text "测试弹幕"
 
 注意:
     弹幕是公开可见的，发出去就撤不回来；先 --dry-run 看清楚再真发。
@@ -44,7 +44,7 @@ CODES = {
 
 
 def main() -> int:
-    here = Path(__file__).resolve().parent
+    here = Path(__file__).resolve().parent.parent
     ap = argparse.ArgumentParser(description="B 站直播间发送弹幕")
     ap.add_argument("--room-id", type=int, required=True)
     ap.add_argument("--text", required=True, help="弹幕内容")

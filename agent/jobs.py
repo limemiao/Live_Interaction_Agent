@@ -85,7 +85,7 @@ class TranscribeJob:
                      "-f", "concat", "-safe", "0", "-i", str(lst),
                      "-c", "copy", str(combined)],
                     cwd=str(self.dir), stdout=lg, stderr=subprocess.STDOUT)
-        cmd = [PYTHON, "-u", str(ROOT / "bili_live_asr.py"),
+        cmd = [PYTHON, "-u", "-m", "integrations.bili_live_asr",
                "--room-id", str(self.room_id or 0),
                "--input-file", str(combined),
                "--model", "Systran/faster-whisper-large-v3",

@@ -8,8 +8,8 @@
     4. 用 nav 接口验证登录态，打印 uid / 昵称
 
 用法:
-    python bili_login.py
-    python bili_login.py --out D:\\somewhere\\bili_cookies.json
+    python -m integrations.bili_login
+    python -m integrations.bili_login --out D:\\somewhere\\bili_cookies.json
 
 注意:
     bili_cookies.json 等同于你的登录凭证，不要外传；测完可以在 B 站退出登录使其失效。
@@ -47,7 +47,7 @@ def mask(value: str) -> str:
 
 
 def main() -> int:
-    here = Path(__file__).resolve().parent
+    here = Path(__file__).resolve().parent.parent
     ap = argparse.ArgumentParser(description="B 站扫码登录")
     ap.add_argument("--out", default=str(here / "bili_cookies.json"))
     ap.add_argument("--qr", default=str(here / "bili_login_qr.png"))
@@ -156,7 +156,7 @@ def main() -> int:
     print(f"  Cookie : {args.out}")
     print("")
     print("接下来可以用它跑弹幕脚本，例如:")
-    print(f"  powershell -File bili_danmaku.ps1 -RoomId 123456789 -Seconds 120 -CookieFile {args.out}")
+    print(f"  powershell -File integrations/bili_danmaku.ps1 -RoomId 123456789 -Seconds 120 -CookieFile {args.out}")
     return 0
 
 

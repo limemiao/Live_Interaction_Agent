@@ -7,7 +7,7 @@
     [switch]$Append,
     # 默认用脚本同目录的凭证。**不要留空**：未登录连接时 B 站不会投放
     # 用户信息（uid 全 0、昵称打码），下游就 @ 不了人、也存不了个人记忆。
-    [string]$CookieFile = (Join-Path $PSScriptRoot 'bili_cookies.json'),
+    [string]$CookieFile = (Join-Path (Split-Path -Parent $PSScriptRoot) 'bili_cookies.json'),
     # 测试用：连上这么多秒后主动断开一次，验证重连路径（0=关闭）
     [int]$ForceReconnectAfter = 0
 )

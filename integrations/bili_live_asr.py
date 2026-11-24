@@ -6,8 +6,8 @@
     -> 带时间戳追加写入转录文件（逐行 flush，随时可看）
 
 用法:
-    python bili_live_asr.py --room-id 123456789 --duration 120
-    python bili_live_asr.py --room-id 123456789 --model large-v3 --chunk 5
+    python -m integrations.bili_live_asr --room-id 123456789 --duration 120
+    python -m integrations.bili_live_asr --room-id 123456789 --model large-v3 --chunk 5
 
 注意:
     - 模型首次运行会从 HuggingFace 下载（国内自动走 hf-mirror 镜像）
@@ -329,7 +329,7 @@ def extract_vocals(separator, path: Path, device: str):
 
 
 def main() -> int:
-    here = Path(__file__).resolve().parent
+    here = Path(__file__).resolve().parent.parent
     ap = argparse.ArgumentParser(description="B 站直播实时语音转文字（本地 faster-whisper）")
     ap.add_argument("--room-id", type=int, required=True)
     ap.add_argument("--cookie-file", default=str(here / "bili_cookies.json"))

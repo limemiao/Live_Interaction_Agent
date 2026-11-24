@@ -7,8 +7,8 @@
 切片文件名自带开始时刻，例如 rec_20261014_163512.wav。
 
 用法:
-    python bili_record.py --room-id 123456789 --minutes 60
-    python bili_record.py --room-id 123456789 --minutes 60 --wait-live
+    python -m integrations.bili_record --room-id 123456789 --minutes 60
+    python -m integrations.bili_record --room-id 123456789 --minutes 60 --wait-live
 """
 
 import argparse
@@ -19,9 +19,8 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from bili_live_asr import UA, get_stream_url, load_cookies  # noqa: E402
+from .bili_live_asr import UA, get_stream_url, load_cookies  # noqa: E402
 
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -67,11 +66,11 @@ def main():
                     help="每个切片时长，默认 300 秒")
     ap.add_argument("--out-dir", default=None)
     ap.add_argument("--cookie-file", default=str(
-        Path(__file__).resolve().parent / "bili_cookies.json"))
+        Path(__file__).resolve().parent.parent / "bili_cookies.json"))
     ap.add_argument("--wait-live", action="store_true")
     args = ap.parse_args()
 
-    here = Path(__file__).resolve().parent
+    here = Path(__file__).resolve().parent.parent
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_dir = Path(args.out_dir) if args.out_dir else (
         here / "audio" / ("%d_%s" % (args.room_id, stamp)))

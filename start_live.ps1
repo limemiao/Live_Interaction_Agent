@@ -1,4 +1,4 @@
-﻿﻿<#
+﻿<#
   一键启动整套直播流程（弹幕抓取 + 语音转录 + 决策/前端）。
 
   用法：
@@ -178,7 +178,7 @@ $whisperModel = 'Systran/faster-whisper-large-v3'
 # ---- ① 弹幕抓取：-Seconds 0 不限时，-Append 断线重连不覆盖 ----
 if (-not $WebOnly -and -not $AsrOnly) {
 $psArgs = @('-ExecutionPolicy', 'Bypass', '-NoProfile', '-File',
-            (Join-Path $root 'bili_danmaku.ps1'),
+            (Join-Path $root 'integrations\bili_danmaku.ps1'),
             '-RoomId', "$RoomId", '-OutFile', $danmakuLog,
             '-Seconds', '0', '-Append', '-CookieFile', $CookieFile)
 $p1 = Start-Process -WindowStyle Hidden -PassThru -FilePath 'powershell.exe' `
@@ -195,7 +195,7 @@ Write-Host ("① 弹幕抓取 PID {0} → {1}" -f $p1.Id, $danmakuLog)
 if ($WebOnly) {
     Write-Host ("② 语音转录：保持运行（PID {0}）" -f $roles['asr'])
 } elseif (-not $NoAsr) {
-    $asrArgs = @('-u', (Join-Path $root 'bili_live_asr.py'),
+    $asrArgs = @('-u', '-m', 'integrations.bili_live_asr',
                  '--room-id', "$RoomId",
                  '--model', $whisperModel,
                  '--separate', '--vad', '--singing-filter', '--chunk', '8',

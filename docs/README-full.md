@@ -199,7 +199,7 @@ os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 cd live_interaction_agent
 
 # 1) 登录（扫码），凭证落到 bili_cookies.json
-& python bili_login.py
+& python -m integrations.bili_login
 
 # 2) 复制并检查配置（见第 5 节）
 copy config.example.yaml config.yaml
@@ -214,11 +214,11 @@ notepad config.yaml
 ```powershell
 # ① 抓弹幕：逐行写日志（-Seconds 0 = 不限时；默认只跑 45 秒，直播要显式传 0）
 #    -Append 追加到已有文件，断线重连不会覆盖
-powershell -ExecutionPolicy Bypass -File .\bili_danmaku.ps1 `
+powershell -ExecutionPolicy Bypass -File .\integrations\bili_danmaku.ps1 `
     -RoomId 123456789 -OutFile danmaku_run.txt -Seconds 0 -Append
 
 # ② 转录主播语音：本地识别，逐行写日志
-& python bili_live_asr.py --room-id 123456789 `
+& python -m integrations.bili_live_asr --room-id 123456789 `
     --model Systran/faster-whisper-large-v3 --separate --vad --singing-filter `
     --chunk 8 --out transcript_run.txt
 
@@ -378,10 +378,10 @@ ffmpeg 拉直播流 → 每 N 秒切一段 wav
 
 ```powershell
 # 录一段存档（默认 60 分钟，每 300 秒一个切片），供离线实验
-& python bili_record.py --room-id 123456789 --minutes 60 --wait-live
+& python -m integrations.bili_record --room-id 123456789 --minutes 60 --wait-live
 
 # 命令行发弹幕（支持回复某人）
-& python bili_send_danmaku.py --room-id 123456789 `
+& python -m integrations.bili_send_danmaku --room-id 123456789 `
     --text "晚上好" --reply-mid 1000000005 --dry-run
 ```
 
